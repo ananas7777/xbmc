@@ -207,6 +207,18 @@ typedef enum {
   XBMCVK_POWER          = 0XDE,
   XBMCVK_SLEEP          = 0XDF,
 
+  XBMCVK_RED		= 0XE0,
+  XBMCVK_GREEN          = 0XE1,
+  XBMCVK_YELLOW         = 0XE2,
+  XBMCVK_BLUE           = 0XE3,
+  XBMCVK_REWIND         = 0XE4,
+  XBMCVK_HELP           = 0XE5,
+  XBMCVK_MUSIC          = 0XE6,
+  XBMCVK_MOVIES         = 0XE7,
+  XBMCVK_SERIES         = 0XE8,
+  XBMCVK_FASTFORWARD    = 0XE9,
+  XBMCVK_SETTINGS       = 0XEA,
+
   XBMCVK_LAST           = 0xFF
 } XBMCVKey;
 

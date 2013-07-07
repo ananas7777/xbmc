@@ -22,6 +22,9 @@
 #include "PivosPowerSyscall.h"
 #include "utils/AMLUtils.h"
 #include "utils/log.h"
+#include <sys/types.h>
+#include <dirent.h>
+
 
 CPivosPowerSyscall::CPivosPowerSyscall()
 {
@@ -98,6 +101,52 @@ bool CPivosPowerSyscall::PumpPowerEvents(IPowerEventsCallback *callback)
     m_OnSuspend = false;
     // wait for all our threads to do their thing
     usleep(1 * 1000 * 1000);
+
+    // Synchronize file system
+    std::string cmd;
+    cmd = "sync";
+    system(cmd.c_str());
+
+    // FIXME--------------
+    // In hindsight this shouldn't be done here, as its to static
+    // Should move shutdown (umount, etc) to an external script
+    // Then build a script to handle remounting on resume.
+    // FIXME--------------
+
+    // Dismount all usb drives
+    DIR           *d;
+    struct dirent *dir;
+    char  * device_path;
+    d = opendir("/dev/disk/by-path");
+    
+
+    if (d)
+    {
+    CLog::Log(LOGINFO, "Suspending: Find usb\n");
+    while ((dir = readdir(d)) != NULL)
+    {
+      CLog::Log(LOGINFO, "Suspending: loop %s\n",dir->d_name);
+      if (strncmp(dir->d_name,"usb",3) == 0)
+        {
+		 cmd="/dev/disk/by-path/";
+		 device_path = realpath(cmd.append(dir->d_name).c_str(),NULL);
+                 if (device_path != NULL)
+		 {
+                 CLog::Log(LOGINFO, "Suspending: umount %s\n", device_path);
+                 
+                 // snprintf(cmd,100,"umount %s\n",device_path);
+                 cmd = "umount ";
+                 cmd.append(device_path);
+                 system(cmd.c_str());
+		 free(device_path);
+                 }
+        }
+    }
+
+    closedir(d);
+    }
+
+    // Sleep
     aml_set_sysfs_str("/sys/power/state", "mem");
     usleep(100 * 1000);
   }
