@@ -737,6 +737,7 @@ XBMC_Event CLinuxInputDevice::ReadEvent()
 
   // rvd, hardware keybounce delay
   static struct input_event levt_old;
+  long key_repeat_usec = g_advancedSettings.m_usbhidrepeatdelay * 1000;
 
   XBMC_Event devt;
 
@@ -773,21 +774,21 @@ XBMC_Event CLinuxInputDevice::ReadEvent()
     }
 
 	// rvd, hardware keybounce delay
-	// Handle only the events with type: EV_KEY and value: 1 (KeyDown).
-	if ((levt.type == EV_KEY) && (levt.value == 1)) {
-    		// Check same key is pressed.
-    		if (levt.code == levt_old.code) {
-        		// Check the time difference of the events.
-        		if ( deltatime_usec(levt.time, levt_old.time) < ((long long)g_advancedSettings.m_usbhidrepeatdelay * 1000)) {
-            			// store the latest key event.
-            			levt_old = levt;
-            			// Jump back to the top of the while loop.
-            			continue;
-        		}				
-    		}			
-    		// store the latest key event.
-    		levt_old = levt;
-	}
+	// Show only the type events: EV_KEY.
+	if (levt.type == EV_KEY) {
+	    // Show KeyDown events only, is value means Key status ( 0 = Release, 1 = Pressed , 2 = Repeat
+	    if (levt.value == 1) { 
+		// Check if the same key is pressed.
+		if (levt.code == levt_old.code) {
+		    if ( deltatime_usec(levt.time, levt_old.time) < key_repeat_usec) {
+			levt_old = levt;
+			return devt;
+		    }
+		}
+		// store only the latest key event of KeyDown.
+		levt_old = levt;
+	    }
+        }
 
     if (!TranslateEvent(levt, devt))
       continue;

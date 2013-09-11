@@ -179,6 +179,7 @@ void CAdvancedSettings::Initialize()
 
   m_remoteDelay = 3;
   m_controllerDeadzone = 0.2f;
+  m_usbhidrepeatdelay = 200;
 
   m_playlistAsFolders = true;
   m_detectAsUdf = false;
@@ -958,6 +959,7 @@ void CAdvancedSettings::ParseSettingsFile(const CStdString &file)
   }
 
   XMLUtils::GetInt(pRootElement, "remotedelay", m_remoteDelay, 1, 20);
+  XMLUtils::GetUInt(pRootElement, "usbhidrepeatdelay", m_usbhidrepeatdelay, 0, 200);
   XMLUtils::GetFloat(pRootElement, "controllerdeadzone", m_controllerDeadzone, 0.0f, 1.0f);
   XMLUtils::GetUInt(pRootElement, "fanartres", m_fanartRes, 0, 1080);
   XMLUtils::GetUInt(pRootElement, "imageres", m_imageRes, 0, 1080);

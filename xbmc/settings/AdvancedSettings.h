@@ -215,6 +215,7 @@ class CAdvancedSettings
     StringMapping m_pathSubstitutions;
     int m_remoteDelay; ///< \brief number of remote messages to ignore before repeating
     float m_controllerDeadzone;
+    unsigned int m_usbhidrepeatdelay;
 
     bool m_playlistAsFolders;
     bool m_detectAsUdf;
