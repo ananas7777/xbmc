@@ -338,29 +338,6 @@ ConnectionState CPosixConnection::GetState() const
     strcpy(wrq.ifr_name, m_interface.c_str());
     if (ioctl(m_socket, SIOCGIWNAME, &wrq) < 0)
       return NETWORK_CONNECTION_STATE_DISCONNECTED;
-
-#if !defined(TARGET_ANDROID)
-    // since the wifi interface can be connected to
-    // any wifi access point, we need to compare the assigned
-    // essid to our connection essid. If they match, then
-    // this connection is up.
-    char essid[IFNAMSIZ];
-    memset(&wrq, 0x00, sizeof(struct iwreq));
-    wrq.u.essid.pointer = (caddr_t)essid;
-    wrq.u.essid.length  = sizeof(essid);
-    strncpy(wrq.ifr_name, m_interface.c_str(), IFNAMSIZ);
-    if (ioctl(m_socket, SIOCGIWESSID, &wrq) < 0)
-      return NETWORK_CONNECTION_STATE_DISCONNECTED;
-
-    if (wrq.u.essid.length <= 0)
-      return NETWORK_CONNECTION_STATE_DISCONNECTED;
-
-    std::string test_essid(essid, wrq.u.essid.length);
-    // Since Android cannot SIOCSIWSCAN (permissions error),
-    // m_essid was defaulted to 'Wifi'. So ignore this check.
-    if (m_essid != test_essid)
-      return NETWORK_CONNECTION_STATE_DISCONNECTED;
-#endif
   }
 
   // finally, we need to see if we have a gateway assigned to our interface.
@@ -704,7 +681,7 @@ bool CPosixConnection::DoConnection(const CIPConfig &ipconfig, std::string passp
   // wait for wap to connect to the AP and udhcp to fetch an IP
   if (m_type == NETWORK_CONNECTION_TYPE_WIFI)
   {
-    for (int i = 0; i < 60; ++i)
+    for (int i = 0; i < 30; ++i)
     {
       if (GetState() == NETWORK_CONNECTION_STATE_CONNECTED)
         break;
