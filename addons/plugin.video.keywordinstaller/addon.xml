@@ -6,7 +6,6 @@
   <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video executable</provides>
   </extension>
-  <extension point="xbmc.python.script" library="default.py" />
   <extension point="xbmc.addon.metadata">
     <summary lang="en">en</summary>
     <description lang="en">Install any plugin or even your own xbmc back up just enter the short-url of the zip</description>
