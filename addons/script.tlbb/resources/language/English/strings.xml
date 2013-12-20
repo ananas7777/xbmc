@@ -15,7 +15,7 @@
     <string id="18">Click Cancel to reboot later.</string>
     <string id="19">A previously downloaded update image has been detected.</string>
     <string id="20">Would you like to complete the update now?</string>
-    <string id="21">(This will take a few minutes and require a reboot.)</string>
+    <string id="21">(This will take a few minutes and requires a reboot.)</string>
     <string id="22">There is currently no update available.</string>
     <string id="23">Update image downloaded.</string>
     <string id="24">The server appears to be busy.</string>
@@ -26,4 +26,5 @@
     <string id="102">Check for updates now</string>  
     <string id="103">Reboot Recovery</string>  
     <string id="104">Factory Reset</string>  
+    <string id="105">Manually Upgrade/Downgrade Firmware</string>  
 </strings>

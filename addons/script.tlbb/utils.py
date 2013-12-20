@@ -119,8 +119,9 @@ def generateMD5(path):
         return '0'
 
     try:
-        import hashlib        
+        import hashlib
         return hashlib.md5(open(path, 'r').read()).hexdigest()
+        
     except:
         pass
 

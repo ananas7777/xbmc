@@ -23,7 +23,7 @@ import os
 import urllib2
 import urllib
 import json
-
+import time
 import utils
 
 
@@ -32,7 +32,16 @@ def checkForUpdate(silent = 1):
     if silent == '2' or silent=='3':
         utils.rebootCommand(silent)
         return
-           
+        
+    if silent == '4':
+        try:
+            url      = 'http://cloud.thelittleblackbox.co.uk/manual.php'
+            response = urllib2.urlopen(url).read()
+        except:
+            return []
+        performManualUpdate(response, silent)
+        return
+        
     utils.saveOta()
     silent = int(silent) == 1
 
@@ -82,11 +91,10 @@ def setAlarm(mins):
 
 def getResponse():
     try:
-        url      = 'http://www.thelittleblackbox.nl/ota.php'
+        url      = 'http://cloud.thelittleblackbox.co.uk/ota.php'
         response = urllib2.urlopen(url).read()
     except:
         return []
-    
     return json.loads(u"" + (response))
 
 
@@ -155,6 +163,75 @@ def performUpdate(response, silent):
         return
 
     reboot()
+    
+    
+def performManualUpdate(response, silent):
+    try:
+        import xbmcgui
+        path = getDownloadPath()
+        select_name=['Cancel']
+        select_url=['Cancel']
+        
+        for i in json.loads(response):
+        
+           cVersion = utils.getSetting('cVersion')
+           
+           if not cVersion in i['Version']:
+               select_name.append(i['Version'])
+               select_url.append(i['Link']+'*'+i['Version']+'*'+i['MD5'])
+               
+        link = select_url[xbmcgui.Dialog().select('Your Current Firmware '+ cVersion , select_name)]
+        
+        if 'Cancel' in link:
+            return
+        url = link.split('*')[0]
+        version = link.split('*')[1]
+        md5 = link.split('*')[2]
+        
+        if utils.generateMD5(path) != md5:
+            if (not silent) and (not utils.yesno(1, 11, 0)):
+            
+                return
+    
+            dp = None
+        
+            if silent:
+                dp = utils.progress(1, 14, 15)
+    
+            hash   = 0
+            count  = 0
+            nTries = 3
+    
+            if not silent:
+                nTries = 1
+        
+            while (count < nTries) and (hash != md5):
+                count += 1
+                try:        
+                    download(url,path,version,dp)
+                    hash = utils.generateMD5(path)
+                except Exception, e:
+                    utils.deleteFile(path)
+                    if str(e) == 'Canceled':                    
+                        return
+    
+            if hash != md5:
+                utils.unflagUpdate()
+                utils.deleteFile(path)
+                utils.setSetting('dVersion', '0.0.0')
+                if not silent:
+                    utils.ok(1, 24, 13)
+                return
+            
+        utils.setSetting('dVersion', version)
+        
+        
+        if not utils.okReboot(1, 23, 16, 18, delay = 15):
+            return
+    
+        reboot()
+    except:
+        return
 
 
 def reboot():
@@ -182,20 +259,32 @@ def download(url, dest, version, dp = None, start = 0, range = 100):
     if not dp:
         urllib.urlretrieve(url,dest)
     else:
-        dp.update(int(start))
-        urllib.urlretrieve(url,dest,lambda nb, bs, fs, url=url: _pbhook(nb,bs,fs,dp,start,range,url))
+        dp.update(0)
+        start_time=time.time()
+        urllib.urlretrieve(url, dest, lambda nb, bs, fs: _pbhook(nb, bs, fs, dp, start_time))
  
-
-def _pbhook(numblocks, blocksize, filesize, dp, start, range, url=None):
+def _pbhook(numblocks, blocksize, filesize, dp, start_time):
     try:
-        percent = min(start+((numblocks*blocksize*range)/filesize), start+range)
-        dp.update(int(percent))
+        percent = min(numblocks * blocksize * 100 / filesize, 100) 
+        currently_downloaded = float(numblocks) * blocksize / (1024 * 1024) 
+        kbps_speed = numblocks * blocksize / (time.time() - start_time) 
+        if kbps_speed > 0: 
+            eta = (filesize - numblocks * blocksize) / kbps_speed 
+        else: 
+            eta = 0 
+        kbps_speed = kbps_speed / 1024 
+        total = float(filesize) / (1024 * 1024) 
+        mbs = '%.02f MB of %.02f MB' % (currently_downloaded, total) 
+        e = 'Speed: %.02f Kb/s ' % kbps_speed 
+        e += 'ETA: %02d:%02d' % divmod(eta, 60) 
+        dp.update(percent, mbs, e)
     except Exception, e:
         utils.log('%s Error Downloading Update' % str(e))
         percent = 100
         dp.update(int(percent))
     if dp.iscanceled(): 
         raise Exception('Canceled')
+
 
 
 if __name__ == '__main__': 
