@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.tlbbwizard" name="TLBB Quick Install Wizard" version="1.0.1" provider-name="Mikey1234,Spoyser,umOuch,J1nx">
+<addon id="plugin.video.tlbbwizard" name="TLBB Quick Install Wizard" version="1.0.1" provider-name="J1nx">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
   </requires>

@@ -254,6 +254,14 @@ def downloaded():
     filename = getDownloadPath()
     return os.path.exists(filename)
 
+def checkPrevious():
+    if not downloaded():
+        return
+
+    utils.flagUpdate()
+
+    if utils.yesno(1, 19, 20, 21):
+        reboot()
 
 def download(url, dest, version, dp = None, start = 0, range = 100):    
     if not dp:
