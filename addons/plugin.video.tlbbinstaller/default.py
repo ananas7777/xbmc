@@ -3,7 +3,7 @@ import urllib,urllib2,sys,re,xbmcplugin,xbmcgui,xbmcaddon,xbmc,os
 import downloader
 import extract
 
-ADDON = xbmcaddon.Addon(id='plugin.video.keywordinstaller')
+ADDON = xbmcaddon.Addon(id='plugin.video.tlbbinstaller')
 
 
 
