@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.keywordinstaller" name="Keyword Installer" version="1.0.1" provider-name="TLBB">
+<addon id="plugin.video.tlbbinstaller" name="TLBB Keyword Installer" version="1.0.1" provider-name="TLBB">
   <requires>
     <import addon="xbmc.python" version="2.0"/>
   </requires>
@@ -8,7 +8,7 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <summary lang="en">en</summary>
-    <description lang="en">Install any plugin or even your own xbmc back up just enter the short-url of the zip</description>
+    <description lang="en">Install any plugin or even your own xbmc backup by just enter a keyword pointing towards a shorturl of the zip</description>
     <platform>all</platform>
   </extension>
 </addon>
